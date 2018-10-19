@@ -24,5 +24,17 @@
   ],
   "devDependencies": {
     "@babel/plugin-proposal-export-default-from": "^7.0.0"
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/operationb/clickgame.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/operationb/clickgame/issues"
+  },
+  "homepage": "https://github.com/operationb/clickgame#readme"
 }
