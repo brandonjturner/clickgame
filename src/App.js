@@ -1,40 +1,88 @@
-import React, { Component } from "react";
-import FriendCard from "./components/FriendCard";
-import Wrapper from "./components/Wrapper";
-import Title from "./components/Title";
-import friends from "./friends.json";
-import "./App.css";
+import React, { Component } from 'react';
+import Row from './components/row';
+import Instructions from './components/instructions';
+import Container from './components/container';
+import Pictures from './pictures.json';
+import PictureCard from './components/pictureCard';
+import './App.css';
 
 class App extends Component {
-  // Setting this.state.friends to the friends json array
+
   state = {
-    friends
-  };
+    gameStart: false,
+    pictures: Pictures,
+    clickedPictures: [],
+    score: 0,
+    topScore: 0,
+    correctGuess: 3
+  }
 
-  removeFriend = id => {
-    // Filter this.state.friends for friends with an id not equal to the id being removed
-    const friends = this.state.friends.filter(friend => friend.id !== id);
-    // Set this.state.friends equal to the new friends array
-    this.setState({ friends });
-  };
+  endInstructions = () => {
+    this.setState({ gameStart: true });
+  }
 
-  // Map over this.state.friends and render a FriendCard component for each friend object
+  handlePicClick = id => {
+    const pics = this.state.pictures;
+    const shuffleArray = arr => arr
+    .map(a => [Math.random(), a])
+    .sort((a, b) => a[0] - b[0])
+    .map(a => a[1]);
+    const shuffledPics = shuffleArray(pics);
+
+    if (this.state.clickedPictures.length === 0 ) {
+      const newClickedPics = this.state.clickedPictures;
+      newClickedPics.push(id);
+      this.setState({clickedPictures: newClickedPics, score: this.state.score + 1, pictures: shuffledPics, correctGuess: 1});
+    }
+    else {
+      const pastClicks = this.state.clickedPictures.filter(ids => ids == id);
+      if (pastClicks.length === 0) {
+        const newClickedPics = this.state.clickedPictures;
+        newClickedPics.push(id);
+        this.setState({clickedPictures: newClickedPics, score: this.state.score + 1, pictures: shuffledPics, correctGuess: 1});
+      }
+      else {
+        console.log("You lose :(");
+        this.state.score > this.state.topScore ? this.setState({topScore: this.state.score, score: 0}) : this.setState({score: 0});
+        this.setState({clickedPictures: [], pictures: shuffledPics, correctGuess: 0});   
+      }
+    }
+  }
+
   render() {
     return (
-      <Wrapper>
-        <Title>Friends List</Title>
-        {this.state.friends.map(friend => (
-          <FriendCard
-            removeFriend={this.removeFriend}
-            id={friend.id}
-            key={friend.id}
-            name={friend.name}
-            image={friend.image}
-            occupation={friend.occupation}
-            location={friend.location}
-          />
-        ))}
-      </Wrapper>
+      <div className="app-body">
+        <nav className="shadow-lg navbar navbar-dark bg-dark ">
+          <ul className="p-0 m-0 w-100">
+            <li><span className="navbar-brand mb-0 h1">Clicky the picky!</span></li>
+            {this.state.correctGuess === 1 ? (<li className="correct">You guessed correctly!</li>) : this.state.correctGuess === 3 ? ((<li className="spin">:^{")"}</li>)) : (<li className="wrong">You guessed incorrectly!</li>)}
+            <li>
+              Score: <span>{ this.state.score }</span> | Top Score: <span>{ this.state.topScore }</span>
+            </li>
+          </ul>
+        </nav>    
+        <div className="container-fluid">
+          {this.state.gameStart ? 
+          (<Container>
+            <Row>
+            {this.state.pictures.map(picture => {
+              return (
+                <PictureCard 
+                value={picture.id}
+                key={picture.id}
+                url={picture.url}
+                handlePicClick={this.handlePicClick}
+                />
+              );
+            })}
+            </Row>
+          </Container>) : 
+          (<Row>
+            <Instructions endInstructions={this.endInstructions} />
+          </Row>)
+          }
+        </div>
+      </div>
     );
   }
 }
